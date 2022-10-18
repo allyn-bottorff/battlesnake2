@@ -8,6 +8,22 @@ type Coord struct {
 	Y int `json:"y"`
 }
 
+func (c *Coord) add(c2 Coord) Coord {
+	var d Coord
+	d.X = c.X + c2.X
+	d.Y = c.Y + c2.Y
+	return d
+}
+
+func (c *Coord) equals(c2 Coord) bool {
+	if c.X == c2.X {
+		if c.Y == c2.Y {
+			return true
+		}
+	}
+	return false
+}
+
 type Battlesnake struct {
 	ID             string         `json:"id"`
 	Name           string         `json:"name"`
