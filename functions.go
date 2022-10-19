@@ -1,37 +1,20 @@
 package main
 
 func move(gs GameState) BattlesnakeMoveResponse {
-	okMoves := []Coord{
-		{X: 1, Y: 0},
-		{X: 0, Y: 1},
-		{X: -1, Y: 0},
-		{X: 0, Y: -1},
+	okMoves := map[Coord]string{
+		{X: 0, Y: 1}:  "up",
+		{X: 0, Y: -1}: "down",
+		{X: 1, Y: 0}:  "right",
+		{X: -1, Y: 0}: "left",
 	}
 
-	okMoves = filterForSelf(gs, okMoves)
-	okMoves = filterForWalls(gs, okMoves)
+	filterForSelf(gs, okMoves)
+	filterForWalls(gs, okMoves)
 
 	move := "down"
 
-	moveMap := map[string]Coord{
-		"up":    {X: 0, Y: 1},
-		"down":  {X: 0, Y: -1},
-		"right": {X: 1, Y: 0},
-		"left":  {X: -1, Y: 0},
-	}
-
 	for _, v := range okMoves {
-
-		switch {
-		case v.equals(moveMap["up"]):
-			move = "up"
-		case v.equals(moveMap["right"]):
-			move = "right"
-		case v.equals(moveMap["down"]):
-			move = "down"
-		case v.equals(moveMap["left"]):
-			move = "left"
-		}
+		move = v
 	}
 
 	return BattlesnakeMoveResponse{Move: move}
@@ -39,36 +22,34 @@ func move(gs GameState) BattlesnakeMoveResponse {
 }
 
 // Return a slice of strings of possible moves after checking for walls
-func filterForWalls(gs GameState, moves []Coord) []Coord {
+func filterForWalls(gs GameState, moves map[Coord]string) {
 	head := gs.You.Head
 
-	var okMoves []Coord
-	for _, v := range moves {
-		dest := head.add(v)
-		if dest.X > 0 && dest.X < gs.Board.Width {
-			if dest.Y > 0 && dest.Y < gs.Board.Height {
-				okMoves = append(okMoves, v)
-			}
+	for k := range moves {
+		dest := head.add(k)
+		if dest.X < 0 || dest.X >= gs.Board.Width {
+			delete(moves, k)
+			continue
+		}
+
+		if dest.Y < 0 || dest.Y >= gs.Board.Height {
+			delete(moves, k)
+			continue
 		}
 	}
-	return okMoves
 
 }
 
-// up:    [1,0]
-// right: [0,1]
-// down:  [-1,0]
-// left:  [0,-1]
-func filterForSelf(gs GameState, moves []Coord) []Coord {
+// Modify the move map to filter out collision cases
+
+func filterForSelf(gs GameState, moves map[Coord]string) {
 	head := gs.You.Head
-	var okMoves []Coord
-	for _, v := range moves {
-		dest := head.add(v)
-		if !inCoordSlice(dest, gs.You.Body) {
-			okMoves = append(okMoves, v)
+	for k := range moves {
+		dest := head.add(k)
+		if inCoordSlice(dest, gs.You.Body) {
+			delete(moves, k)
 		}
 	}
-	return okMoves
 }
 
 func inCoordSlice(p Coord, ps []Coord) bool {
