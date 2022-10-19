@@ -1,7 +1,7 @@
 package main
 
 func move(gs GameState) BattlesnakeMoveResponse {
-	okMoves := map[Coord]string{
+	okMoves := map[Point]string{
 		{X: 0, Y: 1}:  "up",
 		{X: 0, Y: -1}: "down",
 		{X: 1, Y: 0}:  "right",
@@ -10,6 +10,7 @@ func move(gs GameState) BattlesnakeMoveResponse {
 
 	filterForSelf(gs, okMoves)
 	filterForWalls(gs, okMoves)
+	filterForOthers(gs, okMoves)
 
 	move := "down"
 
@@ -21,8 +22,8 @@ func move(gs GameState) BattlesnakeMoveResponse {
 
 }
 
-// Return a slice of strings of possible moves after checking for walls
-func filterForWalls(gs GameState, moves map[Coord]string) {
+// Modify the move map to filter out wall collision cases.
+func filterForWalls(gs GameState, moves map[Point]string) {
 	head := gs.You.Head
 
 	for k := range moves {
@@ -37,24 +38,39 @@ func filterForWalls(gs GameState, moves map[Coord]string) {
 			continue
 		}
 	}
-
 }
 
-// Modify the move map to filter out collision cases
-
-func filterForSelf(gs GameState, moves map[Coord]string) {
+// Modify the move map to filter out self collision cases.
+func filterForSelf(gs GameState, moves map[Point]string) {
 	head := gs.You.Head
 	for k := range moves {
 		dest := head.add(k)
-		if inCoordSlice(dest, gs.You.Body) {
+		if inPointSlice(dest, gs.You.Body) {
 			delete(moves, k)
 		}
 	}
 }
 
-func inCoordSlice(p Coord, ps []Coord) bool {
+func filterForOthers(gs GameState, moves map[Point]string) {
+	head := gs.You.Head
+	for m := range moves {
+		dest := head.add(m)
+		for _, s := range gs.Board.Snakes {
+			if !(gs.You.ID == s.ID) {
+				if gs.You.Length <= s.Length {
+					if inPointSlice(dest, s.Body) {
+						delete(moves, m)
+					}
+				}
+			}
+		}
+	}
+}
+
+// Check to see if a Point is in a Point slice
+func inPointSlice(p Point, ps []Point) bool {
 	for _, v := range ps {
-		if p.X == v.X && p.Y == v.Y {
+		if p == v {
 			return true
 		}
 	}

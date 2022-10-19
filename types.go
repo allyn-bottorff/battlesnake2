@@ -3,33 +3,25 @@ package main
 // API Objects
 // https://docs.battlesnake.com/api
 
-type Coord struct {
+type Point struct {
 	X int `json:"x"`
 	Y int `json:"y"`
 }
 
-func (c *Coord) add(c2 Coord) Coord {
-	var d Coord
+// Add a point to this point and return a new point
+func (c *Point) add(c2 Point) Point {
+	var d Point
 	d.X = c.X + c2.X
 	d.Y = c.Y + c2.Y
 	return d
-}
-
-func (c *Coord) equals(c2 Coord) bool {
-	if c.X == c2.X {
-		if c.Y == c2.Y {
-			return true
-		}
-	}
-	return false
 }
 
 type Battlesnake struct {
 	ID             string         `json:"id"`
 	Name           string         `json:"name"`
 	Health         int            `json:"health"`
-	Body           []Coord        `json:"body"`
-	Head           Coord          `json:"head"`
+	Body           []Point        `json:"body"`
+	Head           Point          `json:"head"`
 	Length         int            `json:"length"`
 	Latency        string         `json:"latency"`
 	Shout          string         `json:"shout"`
@@ -45,8 +37,8 @@ type Customizations struct {
 type Board struct {
 	Height  int           `json:"height"`
 	Width   int           `json:"width"`
-	Food    []Coord       `json:"food"`
-	Hazards []Coord       `json:"hazards"`
+	Food    []Point       `json:"food"`
+	Hazards []Point       `json:"hazards"`
 	Snakes  []Battlesnake `json:"snakes"`
 }
 
