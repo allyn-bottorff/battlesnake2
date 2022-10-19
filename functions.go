@@ -61,10 +61,35 @@ func filterForOthers(gs GameState, moves map[Point]string) {
 					if inPointSlice(dest, s.Body) {
 						delete(moves, m)
 					}
+					if couldHeadToHead(dest, s.Head) {
+						delete(moves, m)
+					}
 				}
 			}
 		}
 	}
+}
+
+// Check to see if a point could collide with an incoming snake
+
+func couldHeadToHead(dest Point, other Point) bool {
+	moves := []Point{
+		{X: 0, Y: 1},  //up,
+		{X: 0, Y: -1}, //down
+		{X: 1, Y: 0},  //right
+		{X: -1, Y: 0}, //left
+	}
+
+	var otherPossPoints []Point
+	for _, m := range moves {
+		otherPossPoints = append(otherPossPoints, m.add(other))
+	}
+
+	if inPointSlice(dest, otherPossPoints) {
+		return true
+	}
+	return false
+
 }
 
 // Check to see if a Point is in a Point slice

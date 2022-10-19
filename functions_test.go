@@ -47,3 +47,21 @@ func TestEqualPoints(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+func TestCouldHeadToHead(t *testing.T) {
+	p1 := Point{X: 4, Y: 4}
+	p2 := Point{X: 3, Y: 4}
+
+	if !couldHeadToHead(p1, p2) {
+		t.Fatal()
+	}
+}
+
+func TestCouldNotHeadToHead(t *testing.T) {
+	p1 := Point{X: 1, Y: 1}
+	p2 := Point{X: 3, Y: 4}
+
+	if couldHeadToHead(p1, p2) {
+		t.Fatal()
+	}
+}
